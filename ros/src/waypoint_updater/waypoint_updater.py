@@ -5,6 +5,9 @@ from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
 
 import math
+from std_msgs.msg import Int32, Header	
+import tf
+
 
 '''
 This node will publish waypoints from the car's current position to some `x` distance ahead.
@@ -27,34 +30,46 @@ LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this n
 class WaypointUpdater(object):
     def __init__(self):
         rospy.init_node('waypoint_updater')
+	
+	self.waypoint =None
+	self.currnet=None
+	
 
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
+	self.traffic_waypoint = None
+	self.obstacle_waypoint = None
+	self.velocity = None
+
+	rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
+        rospy.Subscriber('/obstacle_waypoint', Int32, self.obstacle_cb)
+	rospy.Subscriber('/current_velocity', TwistStamped, self.current_velocity_cb)
 
 
-        self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
+        self.final_waypoints_pub = rospy.Publisher('/final_waypoints', Lane, queue_size=1)
 
         # TODO: Add other member variables you need below
-
-        rospy.spin()
+	while not rospy.is_shutdown():
+		self.run()
+		rospy.Rate(10).sleep()
 
     def pose_cb(self, msg):
         # TODO: Implement
-        pass
+        self.currnet=msg
 
     def waypoints_cb(self, waypoints):
         # TODO: Implement
-        pass
+        self.waypoint = waypoints
 
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement
-        pass
+        self.traffic_waypoint = msg.data
 
     def obstacle_cb(self, msg):
         # TODO: Callback for /obstacle_waypoint message. We will implement it later
-        pass
+        self.obstacle_waypoint = msg.data
 
     def get_waypoint_velocity(self, waypoint):
         return waypoint.twist.twist.linear.x
@@ -69,6 +84,20 @@ class WaypointUpdater(object):
             dist += dl(waypoints[wp1].pose.pose.position, waypoints[i].pose.pose.position)
             wp1 = i
         return dist
+
+    def run(self):
+	if(self.waypoint and self.currnet):
+		index = self.get_waypoint(self.current.post)
+		nindex =  self.get_nwaypint(self.current.post,index)
+		lane = Lane()
+		lane.header.frame_id = '/world'
+            	lane.header.stamp = rospy.Time(0)   
+
+		if self.velocity is not None:
+	       		min_dist_stop = self.velocity**2 / (2.0 * 5.0) + 32.0
+            	else:
+	        	min_dist_stop = 32.0
+
 
 
 if __name__ == '__main__':

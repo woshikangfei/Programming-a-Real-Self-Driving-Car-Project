@@ -5,13 +5,14 @@ from geometry_msgs.msg import PoseStamped, Pose
 from styx_msgs.msg import TrafficLightArray, TrafficLight
 from styx_msgs.msg import Lane
 from sensor_msgs.msg import Image
-from cv_bridge import CvBridge
+from cv_bridge import CvBridge, CvBridgeError
 from light_classification.tl_classifier import TLClassifier
 import tf
 import cv2
 import yaml
+import math
 
-STATE_COUNT_THRESHOLD = 3
+STATE_COUNT_THRESHOLD = 2
 
 class TLDetector(object):
     def __init__(self):
@@ -101,7 +102,20 @@ class TLDetector(object):
 
         """
         #TODO implement
-        return 0
+        closest_index = 0
+     	closest_dist = 100000.
+        p1 = pose.position
+
+	wp = self.waypoints.waypoints
+
+	for i in range(len(wp)):
+	    p2 = wp[i].pose.pose.position
+	    d = self.dist(p1, p2)
+    	    if(d < closest_dist):
+     	        closest_dist = d
+                closest_index = i
+	
+        return closest_index
 
     def get_light_state(self, light):
         """Determines the current color of the traffic light
@@ -132,19 +146,62 @@ class TLDetector(object):
 
         """
         light = None
+	
+	if not self.pose:
+            rospy.logwarn('no self.pose')
+            return -1, TrafficLight.UNKNOWN
+
+        if not self.waypoints:
+            rospy.logwarn('no self.waypoints')
+            return -1, TrafficLight.UNKNOWN
+
 
         # List of positions that correspond to the line to stop in front of for a given intersection
         stop_line_positions = self.config['stop_line_positions']
-        if(self.pose):
-            car_position = self.get_closest_waypoint(self.pose.pose)
+	car_position = self.get_closest_waypoint(self.pose.pose)
+        
 
         #TODO find the closest visible traffic light (if one exists)
 
+        closest_light_index = self.get_closest_trafficlight(self.pose.pose, stop_line_positions)
+	next_light_index = self.get_next_trafficlight(self.pose.pose, closest_light_index, stop_line_positions)
+	# loop for self.lights
+	next_light_index = next_light_index % len(self.lights)
+	light = self.lights[next_light_index]
+        light_wp = self.get_closest_waypoint(light.pose.pose)
+ 	
         if light:
             state = self.get_light_state(light)
             return light_wp, state
-        self.waypoints = None
+        
         return -1, TrafficLight.UNKNOWN
+
+
+    def get_next_trafficlight(self, pose, index, light_list):
+	"""Identifies the first waypoint that is currently ahead of the car
+        Args:
+            index(int): index of the closest waypoint in self.waypoints
+        Returns:
+            int: index of the first waypoint currently ahead of the car
+	"""
+	next_index = index 
+        p1 = pose.position
+	p2 = light_list[index]
+	heading = math.atan2( (p2[1]-p1.y),(p2[0]-p1.x) );
+	quaternion = (
+            pose.orientation.x,
+            pose.orientation.y,
+            pose.orientation.z,
+            pose.orientation.w)
+        euler = tf.transformations.euler_from_quaternion(quaternion)
+	yaw = euler[2]
+	angle = abs(yaw-heading);
+
+        if angle > math.pi/4:
+            next_index += 1
+	
+	return next_index
+
 
 if __name__ == '__main__':
     try:
