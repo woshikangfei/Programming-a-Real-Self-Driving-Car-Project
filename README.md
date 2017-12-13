@@ -8,7 +8,7 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 | Team Member 1    | Yawei Wang |  wangyawei_dlut@163.com   |
 | Team Member 2    | Yuan Xiao |  yuan.tu.xiao@gmail.com  |
 | Team Member 3    | Richard Wang     |  richardw05@gmail.com |
-| Team Member 4    | none       | none   |
+| Team Member 4    | John Tapsell       | johnflux@gmail.com   |
 
 ### Introduction
 
