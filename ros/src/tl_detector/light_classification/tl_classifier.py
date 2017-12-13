@@ -1,9 +1,33 @@
 from styx_msgs.msg import TrafficLight
+import rospy
+import tensorflow as tf
+import numpy as np
+import time
+from PIL import Image
+
 
 class TLClassifier(object):
-    def __init__(self):
+    def __init__(self,paths):
         #TODO load classifier
-        pass
+        self.state = TrafficLight.UNKNOWN
+
+		self.detection_graph = tf.Graph()
+
+        with self.detection_graph.as_default():
+            od_graph_def = tf.GraphDef()
+
+            with tf.gfile.GFile(paths, 'rb') as fid:
+                serialized_graph = fid.read()
+                od_graph_def.ParseFromString(serialized_graph)
+                tf.import_graph_def(od_graph_def, name='')
+
+			self.sess = tf.Session(graph=self.detection_graph)
+		
+		self.image_tensor = self.detection_graph.get_tensor_by_name('image_tensor:0')
+        self.detection_boxes = self.detection_graph.get_tensor_by_name('detection_boxes:0')
+        self.detection_scores = self.detection_graph.get_tensor_by_name('detection_scores:0')
+        self.detection_classes = self.detection_graph.get_tensor_by_name('detection_classes:0')
+    	self.num_detections = self.detection_graph.get_tensor_by_name('num_detections:0')
 
     def get_classification(self, image):
         """Determines the color of the traffic light in the image
@@ -16,4 +40,40 @@ class TLClassifier(object):
 
         """
         #TODO implement light color prediction
-        return TrafficLight.UNKNOWN
+		if 'session' in locals() and session is not None:
+    	    print('Close interactive session')
+            session.close()
+
+   
+		image_np_expanded = np.expand_dims(image , axis=0)
+ 
+
+        with self.detection_graph.as_default():
+            (boxes, scores, classes, num) = self.sess.run(
+                    [self.detection_boxes, self.detection_scores, self.detection_classes, self.num_detections],
+                    feed_dict={self.image_tensor: image_np_expanded})
+
+ 
+
+        output = 0
+		candidate_num = 4
+        vote = []
+		scorestemp =scores[0]
+		classestemp=classes[0]
+        for i in range(candidate_num):
+            if scorestemp[i] < 0.5:
+                break
+            vote.append(self.__label_map_to_traffic_light(int(classestemp[i])))
+        if vote:
+            return max(vote, key=vote.count)
+        else:
+            return 4
+ 
+        return output
+
+	def __label_map_to_traffic_light(self, label_id):
+        traffic_label = int(label_id) - 1
+        if traffic_label in [0, 1, 2, 4]:
+            return  traffic_label
+        return 4
+
