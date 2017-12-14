@@ -193,7 +193,7 @@ class TLDetector(object):
 
     def get_closest_trafficlight(self, pose, light_list):
         closest_index = 0
-            closest_dist = 100000.
+        closest_dist = 100000.
         p1 = pose.position
 
         for i in range(len(light_list)):

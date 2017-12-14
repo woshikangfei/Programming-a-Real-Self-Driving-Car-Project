@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, TwistStamped
 from styx_msgs.msg import Lane, Waypoint
 
 import math
@@ -32,7 +32,7 @@ class WaypointUpdater(object):
         rospy.init_node('waypoint_updater')
 
         self.waypoint = None
-        self.currnet = None
+        self.current_pose: PoseStamped = None
 
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -55,8 +55,8 @@ class WaypointUpdater(object):
             self.loop()
             rate_limiter.sleep()
 
-    def pose_cb(self, msg):
-        self.currnet = msg
+    def pose_cb(self, msg: PoseStamped):
+        self.current_pose = msg
 
     def waypoints_cb(self, waypoints):
         self.waypoint = waypoints
@@ -79,18 +79,16 @@ class WaypointUpdater(object):
     def distance(self, waypoints, wp1, wp2):
         dist = 0
 
-        def dl(a, b): return math.sqrt((a.x - b.x) **
-                                       2 + (a.y - b.y)**2 + (a.z - b.z)**2)
         for i in range(wp1, wp2 + 1):
-            dist += dl(waypoints[wp1].pose.pose.position,
+            dist += self.dist(waypoints[wp1].pose.pose.position,
                        waypoints[i].pose.pose.position)
             wp1 = i
         return dist
 
     def loop(self):
-        if self.waypoint and self.currnet:
-            index = self.get_waypoint(self.currnet.post)
-            nindex = self.get_nwaypint(self.currnet.post, index)
+        if self.waypoint and self.current_pose:
+            index = self.get_waypoint(self.current_pose.post)
+            nindex = self.get_nwaypint(self.current_pose.post, index)
             lane = Lane()
             lane.header.frame_id = '/world'
             lane.header.stamp = rospy.Time(0)
@@ -132,7 +130,7 @@ class WaypointUpdater(object):
                 rospy.loginfo("no   traffic light  ")
                 lane.waypoints = self.waypoint.waypoints[nindex : (nindex + LOOKAHEAD_WPS )]
 
-        self.final_waypoints_pub.publish(lane)
+            self.final_waypoints_pub.publish(lane)
 
     def getWaypoints(self, waypoints):
         last = waypoints[-1]
