@@ -32,7 +32,7 @@ class WaypointUpdater(object):
         rospy.init_node('waypoint_updater')
 
         self.waypoint = None
-        self.current_pose: PoseStamped = None
+        self.current_pose = None
 
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -55,7 +55,7 @@ class WaypointUpdater(object):
             self.loop()
             rate_limiter.sleep()
 
-    def pose_cb(self, msg: PoseStamped):
+    def pose_cb(self, msg):
         self.current_pose = msg
 
     def waypoints_cb(self, waypoints):
