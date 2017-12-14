@@ -32,3 +32,6 @@ RUN mkdir /capstone
 VOLUME ["/capstone"]
 VOLUME ["/root/.ros/log/"]
 WORKDIR /capstone/ros
+
+RUN rosdep update
+
