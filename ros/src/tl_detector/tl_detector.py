@@ -45,8 +45,8 @@ class TLDetector(object):
             '/traffic_waypoint', Int32, queue_size=1)
 
         self.bridge = CvBridge()
-        self.model = rospy.get_param('~model_path')
-        if self.model == "None":
+        self.model = rospy.get_param('~model_path', None)
+        if self.model == None or self.model == "None":
             self.light_classifier = None
         else:
             self.light_classifier = TLClassifier(self.model)
