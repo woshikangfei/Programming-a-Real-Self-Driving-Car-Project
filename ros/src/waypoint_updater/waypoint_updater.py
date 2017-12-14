@@ -121,11 +121,11 @@ class WaypointUpdater(object):
 						lane.waypoints = self.getWaypoints(final_waypoints)
 				else:
 					rospy.loginfo("no braking  traffic light")
-					lane.waypoints = self.waypoint.waypoints[nindex : (nindex + 200 )]
+					lane.waypoints = self.waypoint.waypoints[nindex : (nindex + LOOKAHEAD_WPS )]
 
             else:
 				rospy.loginfo("no   traffic light  ")
-				lane.waypoints = self.waypoint.waypoints[nindex : (nindex + 200 )]
+				lane.waypoints = self.waypoint.waypoints[nindex : (nindex + LOOKAHEAD_WPS )]
 		
 		self.final_waypoints_pub.publish(lane)
 
