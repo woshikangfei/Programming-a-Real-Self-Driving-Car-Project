@@ -4,7 +4,7 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 
 |                  | Name            |  Email                  |
 | --------         | -----           |  ----                   |
-| Team Lead        | kangfei      |  kangfei2017@gmail.com       |
+| Team Lead        | kangfei      |  kang_chao520@163.com       |
 | Team Member 1    | Yawei Wang |  wangyawei_dlut@163.com   |
 | Team Member 2    | Yuan Xiao |  yuan.tu.xiao@gmail.com  |
 | Team Member 3    | Richard Wang     |  richardw05@gmail.com |
