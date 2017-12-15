@@ -25,6 +25,8 @@ RUN apt-get install -y ros-$ROS_DISTRO-cv-bridge
 RUN apt-get install -y ros-$ROS_DISTRO-pcl-ros
 RUN apt-get install -y ros-$ROS_DISTRO-image-proc
 
+RUN apt-get install -y vim
+
 # socket io
 RUN apt-get install -y netbase
 
@@ -34,4 +36,7 @@ VOLUME ["/root/.ros/log/"]
 WORKDIR /capstone/ros
 
 RUN rosdep update
+
+RUN echo "source /capstone/ros//devel/setup.sh" >> /etc/bash.bashrc
+RUN echo "source /etc/bash_completion.d/git-prompt" >> /etc/bash.bashrc
 
