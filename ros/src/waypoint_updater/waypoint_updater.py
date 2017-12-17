@@ -87,8 +87,8 @@ class WaypointUpdater(object):
 
     def loop(self):
         if self.waypoint and self.current_pose:
-            index = self.get_waypoint(self.current_pose.post)
-            nindex = self.get_nwaypint(self.current_pose.post, index)
+            index = self.get_waypoint(self.current_pose.pose)
+            nindex = self.get_nwaypint(self.current_pose.pose, index)
             lane = Lane()
             lane.header.frame_id = '/world'
             lane.header.stamp = rospy.Time(0)
