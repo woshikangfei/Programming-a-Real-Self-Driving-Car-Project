@@ -26,14 +26,14 @@ class ImageDataGenerate(object):
     def __init__(self):
         rospy.init_node('image_data_generate')
 
-        image_data = rospy.Subscriber('/image_raw', Image, self.image_callback)
+        rospy.Subscriber('/image_raw', Image, self.image_callback)
         self.bridge = CvBridge()
 
         self.data_dir = "./data/"
         self.image_name = 0
         mkdir_path(self.data_dir)
         rospy.spin()
-    
+
     def image_callback(self, msg):
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
@@ -50,7 +50,7 @@ class ImageDataGenerate(object):
 
     def adjust_gamma(self, image, gamma=1.0):
         inv_gamma = 1.0 / gamma
-        table = np.array([((i / 255.0) ** inv_gamma) * 255 for i in np.arange(0, 256)]).astype("uint8")
+        table = np.array((np.arange(0, 256) / 255.0) ** inv_gamma * 255, dtype="uint8")
         return cv2.LUT(image, table)
 
 
