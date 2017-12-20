@@ -14,7 +14,6 @@ import math
 
 STATE_COUNT_THRESHOLD = 2
 
-
 class TLDetector(object):
     def __init__(self):
         rospy.init_node('tl_detector')
@@ -51,7 +50,6 @@ class TLDetector(object):
         else:
             self.light_classifier = TLClassifier(self.model)
 
-        #self.light_classifier = TLClassifier()
         self.listener = tf.TransformListener()
 
         self.state = TrafficLight.UNKNOWN
@@ -102,8 +100,6 @@ class TLDetector(object):
         else:
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
-        time1 = rospy.get_time()
-        delta_time = time1 - time0
 
     def get_closest_waypoint(self, pose):
         """Identifies the closest path waypoint to the given position
@@ -152,7 +148,10 @@ class TLDetector(object):
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
         # Get classification
-        return self.light_classifier.get_classification(cv_image)
+        if self.light_classifier:
+            return self.light_classifier.get_classification(cv_image)
+        else:
+            return TrafficLight.UNKNOWN
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
