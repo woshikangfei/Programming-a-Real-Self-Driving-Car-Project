@@ -112,7 +112,7 @@ catkin_make
 source devel/setup.sh
 roslaunch launch/styx.launch
 ```
-3. Run the simulator
+3. Run the simulator.  Untick 'Manual' for autodrive!
 
 ### Real world testing
 1. Download [training bag](https://drive.google.com/file/d/0B2_h37bMVw3iYkdJTlRSUlJIamM/view?usp=sharing) that was recorded on the Udacity self-driving car (a bag demonstraing the correct predictions in autonomous mode can be found [here](https://drive.google.com/open?id=0B2_h37bMVw3iT0ZEdlF4N01QbHc))
