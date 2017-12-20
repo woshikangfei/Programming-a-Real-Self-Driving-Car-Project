@@ -24,6 +24,8 @@ RUN pip install -r requirements.txt
 RUN apt-get install -y ros-$ROS_DISTRO-cv-bridge
 RUN apt-get install -y ros-$ROS_DISTRO-pcl-ros
 RUN apt-get install -y ros-$ROS_DISTRO-image-proc
+RUN apt-get install -y ros-$ROS_DISTRO-image-view
+RUN apt-get install -y ros-kinetic-rviz tmux
 
 RUN apt-get install -y vim
 
@@ -37,6 +39,6 @@ WORKDIR /capstone/ros
 
 RUN rosdep update
 
-RUN echo "source /capstone/ros//devel/setup.sh" >> /etc/bash.bashrc
+RUN echo "source /capstone/ros/devel/setup.sh" >> /etc/bash.bashrc
 RUN echo "source /etc/bash_completion.d/git-prompt" >> /etc/bash.bashrc
 

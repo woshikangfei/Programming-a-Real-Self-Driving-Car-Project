@@ -52,12 +52,15 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 
 Build the docker container
 ```bash
-docker build . -t capstone
+docker build . -t capstone  # Standard non-GPU Dockerfile
+# OR
+docker build . -t capstone -f Dockerfile-GPU  # GPU Dockerfile based on https://github.com/SDC-Team-LastMinute/CarND-Capstone/blob/master/Dockerfile-GPU
 ```
 
 Run the docker file
 ```bash
 docker run -p 4567:4567 -v $PWD:/capstone -v /tmp/log:/root/.ros/ --rm -it capstone
+rosdep update
 ```
 
 Explanation: `-p 4567:4567` redirects the port, `-v $PWD:/capstone` mounts your current working directory
