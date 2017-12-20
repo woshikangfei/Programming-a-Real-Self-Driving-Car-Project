@@ -53,8 +53,8 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 Build the docker container
 ```bash
 docker build . -t capstone  # Standard non-GPU Dockerfile
-# OR
-docker build . -t capstone -f Dockerfile-GPU  # GPU Dockerfile based on https://github.com/SDC-Team-LastMinute/CarND-Capstone/blob/master/Dockerfile-GPU
+# OR for GPU support, you have to install nvidia-docker.  Then something like this:
+nvidia-docker build . -t capstone -f Dockerfile-GPU  # GPU Dockerfile based on https://github.com/SDC-Team-LastMinute/CarND-Capstone/blob/master/Dockerfile-GPU
 ```
 
 Run the docker file
