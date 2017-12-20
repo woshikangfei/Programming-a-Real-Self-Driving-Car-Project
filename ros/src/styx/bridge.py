@@ -41,6 +41,7 @@ class Bridge(object):
         self.server = server
         self.vel = 0.
         self.yaw = None
+        self.prev_time = None
         self.angular_vel = 0.
         self.bridge = CvBridge()
 
