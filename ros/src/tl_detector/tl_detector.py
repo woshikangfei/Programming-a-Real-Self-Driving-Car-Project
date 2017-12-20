@@ -116,18 +116,16 @@ class TLDetector(object):
         closest_dist = 100000.
         p1 = pose.position
 
-        wp = self.waypoints.waypoints
-
-        for i in range(len(wp)):
-            p2 = wp[i].pose.pose.position
+        for index, waypoint in enumerate(self.waypoints.waypoints):
+            p2 = waypoint.pose.pose.position
             d = self.dist(p1, p2)
             if d < closest_dist:
                 closest_dist = d
-                closest_index = i
+                closest_index = index
 
         return closest_index
 
-    def dist(self, x1, x2 = {'x':0, 'y':0, 'z':0}):
+    def dist(self, x1, x2):
         x, y, z = x1.x - x2.x, x1.y - x2.y, x1.z - x2.z
         return math.sqrt(x * x + y * y + z * z)
 
