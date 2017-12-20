@@ -167,7 +167,7 @@ class TLDetector(object):
             return -1, TrafficLight.UNKNOWN
 
         if not self.waypoints:
-            rospy.logwarn('no self.waypoints.  (Maybe run:   rosdep update)')
+            rospy.logwarn('no self.waypoints')
             return -1, TrafficLight.UNKNOWN
 
         stop_line_positions = self.config['stop_line_positions']
