@@ -52,12 +52,15 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 
 Build the docker container
 ```bash
-docker build . -t capstone
+docker build . -t capstone  # Standard non-GPU Dockerfile
+# OR for GPU support, you have to install nvidia-docker.  Then something like this:
+nvidia-docker build . -t capstone -f Dockerfile-GPU  # GPU Dockerfile based on https://github.com/SDC-Team-LastMinute/CarND-Capstone/blob/master/Dockerfile-GPU
 ```
 
 Run the docker file
 ```bash
 docker run -p 4567:4567 -v $PWD:/capstone -v /tmp/log:/root/.ros/ --rm -it capstone
+rosdep update
 ```
 
 Explanation: `-p 4567:4567` redirects the port, `-v $PWD:/capstone` mounts your current working directory
@@ -109,7 +112,7 @@ catkin_make
 source devel/setup.sh
 roslaunch launch/styx.launch
 ```
-3. Run the simulator
+3. Run the simulator.  Untick 'Manual' for autodrive!
 
 ### Real world testing
 1. Download [training bag](https://drive.google.com/file/d/0B2_h37bMVw3iYkdJTlRSUlJIamM/view?usp=sharing) that was recorded on the Udacity self-driving car (a bag demonstraing the correct predictions in autonomous mode can be found [here](https://drive.google.com/open?id=0B2_h37bMVw3iT0ZEdlF4N01QbHc))

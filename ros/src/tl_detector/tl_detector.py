@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import Int32
-from geometry_msgs.msg import PoseStamped, Pose
+from geometry_msgs.msg import PoseStamped, Pose, PointStamped, Point
 from styx_msgs.msg import TrafficLightArray, TrafficLight
 from styx_msgs.msg import Lane
 from sensor_msgs.msg import Image
@@ -13,7 +13,6 @@ import yaml
 import math
 
 STATE_COUNT_THRESHOLD = 2
-
 
 class TLDetector(object):
     def __init__(self):
@@ -51,7 +50,6 @@ class TLDetector(object):
         else:
             self.light_classifier = TLClassifier(self.model)
 
-        #self.light_classifier = TLClassifier()
         self.listener = tf.TransformListener()
 
         self.state = TrafficLight.UNKNOWN
@@ -102,8 +100,6 @@ class TLDetector(object):
         else:
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
-        time1 = rospy.get_time()
-        delta_time = time1 - time0
 
     def get_closest_waypoint(self, pose):
         """Identifies the closest path waypoint to the given position
@@ -120,18 +116,16 @@ class TLDetector(object):
         closest_dist = 100000.
         p1 = pose.position
 
-        wp = self.waypoints.waypoints
-
-        for i in range(len(wp)):
-            p2 = wp[i].pose.pose.position
+        for index, waypoint in enumerate(self.waypoints.waypoints):
+            p2 = waypoint.pose.pose.position
             d = self.dist(p1, p2)
             if d < closest_dist:
                 closest_dist = d
-                closest_index = i
+                closest_index = index
 
         return closest_index
 
-    def dist(self, x1, x2 = {'x':0, 'y':0, 'z':0}):
+    def dist(self, x1, x2):
         x, y, z = x1.x - x2.x, x1.y - x2.y, x1.z - x2.z
         return math.sqrt(x * x + y * y + z * z)
 
@@ -152,7 +146,10 @@ class TLDetector(object):
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
         # Get classification
-        return self.light_classifier.get_classification(cv_image)
+        if self.light_classifier:
+            return self.light_classifier.get_classification(cv_image)
+        else:
+            return TrafficLight.UNKNOWN
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
