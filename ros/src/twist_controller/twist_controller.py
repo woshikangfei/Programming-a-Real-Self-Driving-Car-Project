@@ -10,6 +10,7 @@ ONE_MPH = 0.44704
 class TwistController(object):
     def __init__(self, *args, **kwargs):
         # TODO: Implement
+        # Define and initialize each params will be used in control
         self.wheel_base = kwargs['wheel_base']
         self.vehicle_mass = kwargs['vehicle_mass']
         self.fuel_capacity = kwargs['fuel_capacity']
@@ -25,7 +26,14 @@ class TwistController(object):
 
         self.yaw_controller = YawController(
             self.wheel_base, steer_ratio, min_speed, max_lat_accel, self.max_steer_angle)
-        self.lowpassfilter = LowPassFilter(0.5, 0.1)
+
+        self.current_linear_velocity_lowpassfilter = LowPassFilter(150, 75)
+        self.steer_lowpassfilter = LowPassFilter(150, 75)
+        self.throttle_pid = PID(0.1, 0.007, 0)
+
+        self.throttle = 0.
+        self.brake = 0.
+        self.steer = 0.
 
     def control(self, proposed_twist, current_twist, dbw_enabled):
         # TODO: Change the arg, kwarg list to suit your needs
@@ -37,29 +45,26 @@ class TwistController(object):
 
         delta_linear_velocity = proposed_linear_velocity - current_linear_velocity
 
-        brake = 0.
-        throttle = 0.
         if dbw_enabled:
             if proposed_linear_velocity > current_linear_velocity:
                 if delta_linear_velocity / proposed_linear_velocity > 0.3:
-                    throttle = self.max_throttle_percentage
+                    self.throttle = self.max_throttle_percentage
                 else:
-                    throttle = max((delta_linear_velocity / proposed_linear_velocity) /
+                    self.throttle = max((delta_linear_velocity / proposed_linear_velocity) /
                                    0.3 * self.max_throttle_percentage, self.max_throttle_percentage)
             elif current_linear_velocity > 1:
-                brake = 3250 * self.max_braking_percentage * -1
+                self.brake = 3250 * self.max_braking_percentage * -1
             else:
-                brake = 3250 * 0.01
+                self.brake = 3250 * 0.01
 
-            steer = self.yaw_controller.get_steering(
+            self.steer = self.yaw_controller.get_steering(
                 proposed_linear_velocity, proposed_angular_velocity, current_linear_velocity)
-            steer = max(-self.max_steer_angle, min(steer, self.max_steer_angle))
+            self.steer = max(-self.max_steer_angle, min(self.steer, self.max_steer_angle))
 
-        else:
-            throttle = 0.
-            brake = 0.
-            steer = 0.
-        steer = self.lowpassfilter.filt(steer)
-        rospy.loginfo("throttle:" + str(throttle) + "brake:" +
-                      str(brake) + "steer" + str(steer))
-        return throttle, brake, steer
+
+        self.steer = self.lowpassfilter.filt(self.steer)
+        rospy.loginfo("throttle:" + str(self.throttle) + "brake:" +
+                      str(self.brake) + "steer" + str(self.steer))
+
+        # Return throttle, brake, steer
+        return self.throttle, self.brake, self.steer
