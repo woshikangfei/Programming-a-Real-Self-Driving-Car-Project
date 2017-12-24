@@ -11,8 +11,10 @@ import tf
 import cv2
 import yaml
 import math
+import numpy as np
 
 STATE_COUNT_THRESHOLD = 2
+
 
 class TLDetector(object):
     def __init__(self):
@@ -35,7 +37,7 @@ class TLDetector(object):
         '''
         sub3 = rospy.Subscriber('/vehicle/traffic_lights',
                                 TrafficLightArray, self.traffic_cb)
-        sub6 = rospy.Subscriber('/image_color', Image, self.image_cb)
+        sub6 = rospy.Subscriber('/image_color', Image, self.image_cb, queue_size=1)
 
         config_string = rospy.get_param("/traffic_light_config")
         self.config = yaml.load(config_string)
@@ -44,7 +46,7 @@ class TLDetector(object):
             '/traffic_waypoint', Int32, queue_size=1)
 
         self.bridge = CvBridge()
-        self.model = rospy.get_param('~model_path', None)
+        self.model = rospy.get_param('~model_path', "tl_model.h5")
         if self.model == None or self.model == "None":
             self.light_classifier = None
         else:
@@ -144,10 +146,17 @@ class TLDetector(object):
             return False
 
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+        cv_image_copy = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
         # Get classification
         if self.light_classifier:
-            return self.light_classifier.get_classification(cv_image)
+            b = self.light_classifier.get_localization(cv_image, visual=False)
+            if np.array_equal(b, np.zeros(4)):
+                return TrafficLight.UNKNOWN
+            else:
+                cv2.rectangle(cv_image, (b[1], b[0]), (b[3], b[2]), (0, 255, 0), 2)
+                img_np = cv2.resize(cv_image_copy[b[0]:b[2], b[1]:b[3]], (32, 32))
+                return self.light_classifier.get_classification(img_np)
         else:
             return TrafficLight.UNKNOWN
 
