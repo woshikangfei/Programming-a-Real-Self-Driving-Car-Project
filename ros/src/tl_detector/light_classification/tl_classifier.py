@@ -160,7 +160,7 @@ class TLClassifier(object):
         predict = np.squeeze(predict, axis=0)
         # Get color classification
         tl_color = self.signal_classes[np.argmax(predict)]
-        print(tl_color, ', Classification result:', predict[np.argmax(predict)])
+        # print(tl_color, ', Classification result:', predict[np.argmax(predict)])
 
         # TrafficLight message
         return self.signal_classes.index(tl_color)

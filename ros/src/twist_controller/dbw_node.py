@@ -78,8 +78,7 @@ class DBWNode(object):
         self.dbw_enabled = False
         self.controller = TwistController(**params)
 
-        rospy.Subscriber('/current_velocity', TwistStamped,
-                            self.current_velocity_cb)
+        rospy.Subscriber('/current_velocity', TwistStamped, self.current_velocity_cb)
         rospy.Subscriber('/twist_cmd', TwistStamped, self.twist_cmd_cb)
         rospy.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_enabled_cb)
 
