@@ -62,7 +62,7 @@ class TwistController(object):
             self.steer = max(-self.max_steer_angle, min(self.steer, self.max_steer_angle))
 
 
-        self.steer = self.lowpassfilter.filt(self.steer)
+        self.steer = self.steer_lowpassfilter.filt(self.steer)
         rospy.loginfo("throttle:" + str(self.throttle) + "brake:" +
                       str(self.brake) + "steer" + str(self.steer))
 

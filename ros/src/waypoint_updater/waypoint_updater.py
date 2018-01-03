@@ -55,6 +55,7 @@ class WaypointUpdater(object):
             self.loop()
             rate_limiter.sleep()
 
+    # Call back for base, traffic, obstacle waypoints and current velocity and position
     def pose_cb(self, msg):
         self.current_pose = msg
 
