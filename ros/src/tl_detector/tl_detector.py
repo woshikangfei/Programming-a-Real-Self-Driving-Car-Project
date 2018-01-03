@@ -45,10 +45,7 @@ class TLDetector(object):
 
         self.bridge = CvBridge()
         self.model = rospy.get_param('~model_path', None)
-        if self.model == None or self.model == "None":
-            self.light_classifier = None
-        else:
-            self.light_classifier = TLClassifier(self.model)
+        self.light_classifier = TLClassifier(self.model)
 
         self.listener = tf.TransformListener()
 

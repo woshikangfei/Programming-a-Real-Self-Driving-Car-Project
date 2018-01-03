@@ -48,7 +48,7 @@ class TwistController(object):
             throttle = min(throttle, self.max_throttle_percentage)
             if (throttle < 0.05 and current_linear_velocity < 1) or throttle < 0:
                 if current_linear_velocity > 1:
-                    brake = 3250 * self.max_braking_percentage
+                    brake = 3250 * -self.max_braking_percentage
                 else:
                     brake = 3250 * 0.01
 
