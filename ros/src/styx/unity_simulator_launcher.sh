@@ -10,7 +10,7 @@ if [ ! -f "$USER_PROFILE" ];
     echo "What is the full path to your Unity simulator?"
     read unity_path
 
-    # write to the fileus
+    # write to the file
     echo "$unity_path" > $USER_PROFILE
   else
     unity_path=$(cat "$USER_PROFILE")
