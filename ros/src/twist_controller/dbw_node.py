@@ -35,7 +35,6 @@ class DBWNode(object):
     def __init__(self):
         rospy.init_node('dbw_node')
 
-        # Fetch value from parameter server
         vehicle_mass = rospy.get_param('~vehicle_mass', 1736.35)
         fuel_capacity = rospy.get_param('~fuel_capacity', 13.5)
         brake_deadband = rospy.get_param('~brake_deadband', .1)
@@ -76,8 +75,10 @@ class DBWNode(object):
         self.current_velocity = None
         self.twist_cmd = None
         self.dbw_enabled = False
+
         self.controller = TwistController(**params)
 
+        # TODO: Subscribe to all the topics you need to
         rospy.Subscriber('/current_velocity', TwistStamped,
                             self.current_velocity_cb)
         rospy.Subscriber('/twist_cmd', TwistStamped, self.twist_cmd_cb)
@@ -97,7 +98,6 @@ class DBWNode(object):
             # if <dbw is enabled>:
             #   self.publish(throttle, brake, steer)
             if self.current_velocity and self.twist_cmd:
-                # Adjust control commands according to target twist(linear/angular speed)
                 throttle, brake, steer = self.controller.control(self.twist_cmd.twist,
                                                                  self.current_velocity.twist,
                                                                  self.dbw_enabled)

@@ -34,7 +34,7 @@ class TLDetector(object):
         rely on the position of the light and the camera image to predict it.
         '''
         sub3 = rospy.Subscriber('/vehicle/traffic_lights',
-                                TrafficLightArray, self.traffic_cb)
+                                TrafficLightArray, self.traffic_cb)  ##  traffic light's position in 3D space
         sub6 = rospy.Subscriber('/image_color', Image, self.image_cb)
 
         config_string = rospy.get_param("/traffic_light_config")
